@@ -1,14 +1,11 @@
 {
     "builds": [
-      {
-        "src": "./app.js",
-        "use": "@vercel/node"
-      }
+      { "src": "backend.js", "use": "@vercel/node" }
     ],
     "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "/app.js"
-      }
+      { "src": "/upload-image", "dest": "backend.js" },
+      { "src": "/get-image/:filename", "dest": "backend.js" },
+      { "src": "/(.*)", "dest": "backend.js" }
     ]
   }
+  
