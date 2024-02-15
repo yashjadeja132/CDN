@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
 app.use(express.json());
 const cors = require("cors");
 app.use(cors());
@@ -30,10 +29,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.post("/upload-image", upload.single("image"), async (req, res) => {
-  console.log(req.body);
-  const imageName = req.file.filename;
-
   try {
+    const imageName = req.file.filename;
     res.json({ status: "ok", data: imageName });
   } catch (error) {
     res.json({ status: error });
