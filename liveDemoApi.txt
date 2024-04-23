@@ -8,14 +8,13 @@ const imageData = new FormData();
 imageData.append("image", selectedFile); //selectedFile is geted imput file, it's data type is file (instend of file)
 axios.post(`https://cdn-q9la.onrender.com/upload-image`, imageData);
 
-
 //get demo in react
 axios.get(`https://cdn-q9la.onrender.com/get-image/1713875723318download (2).jpeg`);
 
 //put demo in react
 const updatedImageData = new FormData();
 updatedImageData.append("image", selectedFile); //selectedFile is geted imput file, it's data type is file (instend of file)
-axios.put(`https://cdn-q9la.onrender.com/upload-image/17080155885191.jpg`, updatedImageData);
+axios.put(`https://cdn-q9la.onrender.com/upload-image/1713875723318download (2).jpeg`, updatedImageData);
 
 //delete demo in react
-axios.delete(`https://cdn-q9la.onrender.com/delete-image/1708015773573f9.jpg`);
+axios.delete(`https://cdn-q9la.onrender.com/delete-image/1713875723318download (2).jpeg`);
