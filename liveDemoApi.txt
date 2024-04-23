@@ -10,7 +10,7 @@ axios.post(`https://cdn-q9la.onrender.com/upload-image`, imageData);
 
 
 //get demo in react
-axios.get(`https://cdn-q9la.onrender.com/get-image/17080155885191.jpg`);
+axios.get(`https://cdn-q9la.onrender.com/get-image/1713875723318download (2).jpeg`);
 
 //put demo in react
 const updatedImageData = new FormData();
