@@ -5,96 +5,103 @@ const cors = require("cors");
 app.use(cors());
 const fs = require("fs");
 const path = require("path");
+const multer = require("multer");
 
 app.get("/", async (req, res) => {
 	res.send("Success!!!!!!");
 });
 
 app.listen(2009, () => {
-	console.log("Server Started");
+	console.log("Server Started on Port 2009");
 });
 
-const multer = require("multer");
-
+// Configure Multer for all file types
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, "./images/");
+		cb(null, "./uploads/"); // Store all files in the 'uploads' directory
 	},
 	filename: function (req, file, cb) {
 		const uniqueSuffix = Date.now();
-		cb(null, uniqueSuffix + file.originalname);
+		cb(null, uniqueSuffix + "-" + file.originalname);
 	},
 });
 
 const upload = multer({ storage: storage });
 
-app.post("/upload-image", upload.single("image"), async (req, res) => {
+// Upload any file
+app.post("/upload-file", upload.single("file"), async (req, res) => {
 	try {
-		const imageName = req.file.filename;
-		res.json({ status: "ok", data: imageName });
+		const fileName = req.file.filename;
+		res.json({ status: "ok", data: fileName });
 	} catch (error) {
-		res.json({ status: error });
+		res.status(500).json({ status: "error", message: error.message });
 	}
 });
 
-app.get("/get-image/:filename", async (req, res) => {
+// Upload multiple files
+app.post("/upload-files", upload.array("files", 10), async (req, res) => {
+	try {
+		const fileNames = req.files.map(file => file.filename);
+		res.json({ status: "ok", data: fileNames });
+	} catch (error) {
+		res.status(500).json({ status: "error", message: error.message });
+	}
+});
+
+// Retrieve any file
+app.get("/get-file/:filename", async (req, res) => {
 	try {
 		const filename = req.params.filename;
-		const filePath = path.join("./images/", filename);
+		const filePath = path.join("./uploads/", filename);
 		if (fs.existsSync(filePath)) {
 			const fileBuffer = fs.readFileSync(filePath);
-			res.set("Content-Type", "image/jpeg");
+			const mimeType = require("mime-types").lookup(filename) || "application/octet-stream";
+			res.set("Content-Type", mimeType);
 			res.send(fileBuffer);
 		} else {
-			res.status(404).json({ status: "error", message: "Image not found" });
-		}
-	} catch (error) {
-		res.json({ status: error });
-	}
-});
-
-app.delete("/delete-image/:filename", upload.single("image"), async (req, res) => {
-	try {
-		const filename = req.params.filename;
-
-		const filePath = path.join(
-			"./images/",
-			filename
-		);
-
-		if (fs.existsSync(filePath)) {
-			fs.unlinkSync(filePath);
-			res.status(200).json({
-				status: "ok",
-				message: "Files Deleted successfully!",
-			});
-		} else {
-			res.status(201).json({ status: "error", message: "File not found" });
+			res.status(404).json({ status: "error", message: "File not found" });
 		}
 	} catch (error) {
 		res.status(500).json({ status: "error", message: error.message });
 	}
 });
 
-app.put("/update-image/:filename", upload.single("image"), async (req, res) => {
+// Delete any file
+app.delete("/delete-file/:filename", async (req, res) => {
 	try {
 		const filename = req.params.filename;
-
-		const filePath = path.join(
-			"./images/",
-			filename
-		);
+		const filePath = path.join("./uploads/", filename);
 
 		if (fs.existsSync(filePath)) {
 			fs.unlinkSync(filePath);
-			const uploadedFiles = req.file.filename;
 			res.status(200).json({
 				status: "ok",
-				message: "Files Updated successfully!",
-				files: uploadedFiles,
+				message: "File deleted successfully!",
 			});
 		} else {
-			res.status(201).json({ status: "error", message: "File not found" });
+			res.status(404).json({ status: "error", message: "File not found" });
+		}
+	} catch (error) {
+		res.status(500).json({ status: "error", message: error.message });
+	}
+});
+
+// Update (replace) any file
+app.put("/update-file/:filename", upload.single("file"), async (req, res) => {
+	try {
+		const filename = req.params.filename;
+		const filePath = path.join("./uploads/", filename);
+
+		if (fs.existsSync(filePath)) {
+			fs.unlinkSync(filePath); // Delete the old file
+			const uploadedFile = req.file.filename;
+			res.status(200).json({
+				status: "ok",
+				message: "File updated successfully!",
+				file: uploadedFile,
+			});
+		} else {
+			res.status(404).json({ status: "error", message: "File not found" });
 		}
 	} catch (error) {
 		res.status(500).json({ status: "error", message: error.message });
